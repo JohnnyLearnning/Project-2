@@ -1,0 +1,90 @@
+# Defining project Tag
+variable "project" {
+  default = "team-4-project-2"
+}
+# Defining createdBy Tag
+variable "createdBy" {
+  default = "dante-clark"
+}
+# Defining ami id
+variable "image_id" {
+  default = "ami-079db87dc4c10ac91"
+}
+# Defining instance type for connection
+variable "instance_type" {
+  default = "t3.small"
+}
+# Defining arn for iam role
+variable "iam_arn" {
+  default = "arn:aws:iam::782863115905:instance-profile/S3-role"
+}
+# Defining Key Name for connection
+variable "key_name" {
+  default = "dc-key"
+  description = "Name of AWS key pair"
+}
+# Defining min size CIDR Block for 2d Subnet
+variable "min_size" {
+  default = "2"
+}
+# Defining max size for ASG
+variable "max_size" {
+  default = "4"
+}
+# Defining desired capacity for ASG
+variable "desired_capacity" {
+  default = "2"
+}
+# Defining CIDR Block for VPC
+variable "vpc_cidr" {
+  default = "10.0.0.0/16"
+}
+# Defining CIDR Block for Subnet 1
+variable "subnet_cidr" {
+  default = "10.0.0.0/19"
+}
+# Defining CIDR Block for Subnet 2
+variable "subnet1_cidr" {
+  default = "10.0.32.0/19"
+}
+# Defining CIDR Block for Subnet 3
+variable "subnet2_cidr" {
+  default = "10.0.64.0/19"
+}
+# Defining CIDR Block for Subnet 4
+variable "subnet3_cidr" {
+  default = "10.0.96.0/19"
+}
+# Defining CIDR Block for Subnet 5
+variable "subnet4_cidr" {
+  default = "10.0.128.0/19"
+}
+# Defining CIDR Block for Subnet 6
+variable "subnet5_cidr" {
+  default = "10.0.160.0/19"
+}
+# Defining Vars for the user script
+variable "DatabaseName" {
+  default = "Test"
+}
+variable "DatabaseHostName" {
+  default = "Test"
+}
+variable "DatabaseUsername" {
+  default = "Test"
+}
+variable "DatabasePassword" {
+  default = "Test"
+}
+variable "Password" {
+  default = "SkillStormAWS2024!!"
+}
+variable "Email" {
+  default = "dmc1997@outlook.com"
+}
+variable "ALBDNSName" {
+  default = ""
+}
+variable "region" {
+  default = "us-east-1"
+}

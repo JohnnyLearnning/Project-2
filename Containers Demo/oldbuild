@@ -1,0 +1,29 @@
+
+
+# Use an official Python runtime as a parent image (go to docker hub pick which image you want)
+# FROM python:3.13.0a3-alpine3.18
+
+# #specifying work directory mkdir /app && cd /app
+# WORKDIR /app
+
+# COPY . .
+
+# #Install Flask ( pip freeze >.\requirements.txt)
+# RUN pip install flask
+
+# EXPOSE 5000
+
+# CMD ["python", "./app.py"]
+
+#run docker build -t flask .   command -t tag and . is the directory
+#docker run -d -p 5000:5000 flask
+# if ports is already being used (change port to 5001:5000 or anyport)
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,15 @@
+#sdk uses boto 3 
+CDK uses cloudformation 
+#https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-python.html
+
+#choco instal nodejs: in powershell admin
+#node -v
+#npm -v
+
+# install in powershell npm install -g aws-cdk in new terminal
+
+#python.exe -m pip install --upgrade pip in new terminal
+#update the cdk new stack
+# cdk synth to test 
+# u might have to bootstrap ur acount cdk bootstrap
+# cdk deploy

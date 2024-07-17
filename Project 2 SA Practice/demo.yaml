@@ -1,0 +1,212 @@
+#type :start to set up template 
+AWSTemplateFormatVersion: 2010-09-09 # (Required) always the same
+
+#describes what the template does
+#Description: Deploy vpc with public and private subnets, nat gateway, routes and a route table
+
+
+#Metadata: # categorize parameters
+
+
+# input variables
+Parameters: 
+  VpcCIDR:
+    Description: my vpc cidr
+    Type: String 
+    Default: 10.0.0.0/16
+
+  Public1CIDR:
+    Description: public subnet CIDR
+    Type: String
+    Default: 10.0.0.0/24
+
+  Public2CIDR:
+    Description: public subnet CIDR
+    Type: String
+    Default: 10.0.1.0/24
+
+  Private1CIDR:
+    Description: public subnet CIDR
+    Type: String
+    Default: 10.0.100.0/24
+
+  Private2CIDR:
+    Description: public subnet CIDR
+    Type: String
+    Default: 10.0.101.0/24
+
+
+#Mappings: # map of like items
+
+
+#Conditions: # conditional statements that allow or deny based on specific conditions
+
+#aws cloudformation document vpc use aws::ec2::vpc under properties > copy from doc
+#Required 
+Resources: 
+
+  Type: AWS::EC2::VPC
+  Properties:
+    CidrBlock:!Ref VpcCIDR:
+    EnableDnsHostnames: true
+    EnableDnsSupport: true
+    Tags: 
+      - Key: Name
+        Value: Jtrinh-vpc   
+
+  # for subnets https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet.html
+  # Internet Gateway
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags: 
+        - Key: Name
+          Value: Jtrinh-igw
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway 
+      VpcId: !Ref VPC 
+ # Elastic IPs
+  EIP1:
+    Type: AWS::EC2::EIP
+    Properties:
+      Tags: 
+        - Key: Name
+          Value: Jtrinh-EIP1
+
+  EIP2:
+    Type: AWS::EC2::EIP
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Jtrinh-EIP2
+ #Nat gateways 1&2
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt EIP1.AllocationId
+      SubnetId: !Ref PublicSubnet1
+      Tags: 
+        - Key: Name
+          Value: Jtrinh-ngw1
+
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt EIP2.AllocationId
+      SubnetId: !Ref PublicSubnet2
+      Tags: 
+        - Key: Name
+          Value: Jtrinh-ngw2
+
+ # Public Subnets
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [0, !GetAZs ]
+      CidrBlock: !Ref Public1CIDR
+      MapPublicIpOnLaunch: true
+      Tags: 
+        - Key: Name
+          Value: Jtrinh-public-subnet1
+      VpcId: !Ref VPC
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [1, !GetAZs ]
+      CidrBlock: !Ref Public2CIDR
+      MapPublicIpOnLaunch: true
+      Tags: 
+        - Key: Name
+          Value: Jtrinh-public-subnet2
+      VpcId: !Ref VPC
+  #Private Subnets
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [0, !GetAZs ]
+      CidrBlock: !Ref Private1CIDR
+      Tags: 
+        - Key: Name
+          Value: Jtrinh-private-subnet1
+      VpcId: !Ref VPC
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [1, !GetAZs ]
+      CidrBlock: !Ref Private2CIDR
+      Tags: 
+        - Key: Name
+          Value: Jtrinh-private-subnet2
+      VpcId: !Ref VPC
+
+  #Public Route Table
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags: 
+        - Key: Name
+          Value: Jtrinh-pubic-rtb
+      VpcId: !Ref VPC
+
+  PublicSubnet1RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+
+  PublicSubnet2RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2
+
+  PublicRoute: 
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:!Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+ #Private Route Table     
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags: 
+        - Key: Name
+          Value: Jtrinh-private-rtb
+      VpcId: !Ref VPC
+
+  PrivateSubnet1RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet1
+
+  PrivateSubnet2RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet2
+ #Route Nat to Private Subnet
+  PrivateRoute1: 
+    Type: AWS::EC2::Route
+    Properties: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway1
+
+  PrivateRoute2: 
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway2
+
+#upload to cloudformation, create stack, upload template from file, create, stack name, next, if any of our resoucres require a role select an IAM role, Stack Failover options, Submit
+#quick link lets u share build resources quickly, u can use detect drift 
+
+
+#Outputs: displays your out put
